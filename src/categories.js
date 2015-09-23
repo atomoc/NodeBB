@@ -9,7 +9,13 @@ var async = require('async'),
 	Groups = require('./groups'),
 	plugins = require('./plugins'),
 	validator = require('validator'),
-	privileges = require('./privileges');
+	privileges = require('./privileges'),
+	
+	md = require('markdown-it')({
+		html: true,
+		linkify: true,
+		typographer: true
+	});
 
 (function(Categories) {
 
@@ -55,7 +61,9 @@ var async = require('async'),
 				category.nextStart = results.topics.nextStart;
 				category.pageCount = results.pageCount;
 				category.isIgnored = results.isIgnored[0];
-
+				if (!category.content) category.content = false;
+				else category.content = md.render(category.content);
+				
 				plugins.fireHook('filter:category.get', {category: category, uid: data.uid}, function(err, data) {
 					callback(err, data ? data.category : null);
 				});
@@ -112,7 +120,7 @@ var async = require('async'),
 				privileges.categories.filterCids(privilege, cids, uid, next);
 			},
 			function(cids, next) {
-				Categories.getCategories(cids, uid, next);
+				Categories.getCategories(cids, uid, next, 'stop');
 			}
 		], callback);
 	};
@@ -225,8 +233,8 @@ var async = require('async'),
 	Categories.incrementCategoryFieldBy = function(cid, field, value, callback) {
 		db.incrObjectFieldBy('category:' + cid, field, value, callback);
 	};
-
-	Categories.getCategories = function(cids, uid, callback) {
+var cacaca = false;
+	Categories.getCategories = function(cids, uid, callback, stop) {
 		if (!Array.isArray(cids)) {
 			return callback(new Error('[[error:invalid-cid]]'));
 		}
@@ -234,39 +242,43 @@ var async = require('async'),
 		if (!cids.length) {
 			return callback(null, []);
 		}
-
-		async.parallel({
-			categories: function(next) {
-				Categories.getCategoriesData(cids, next);
-			},
-			children: function(next) {
-				Categories.getChildren(cids, uid, next);
-			},
-			parents: function(next) {
-				Categories.getParents(cids, next);
-			},
-			hasRead: function(next) {
-				Categories.hasReadCategories(cids, uid, next);
-			}
-		}, function(err, results) {
-			if (err) {
-				return callback(err);
-			}
-
-			var categories = results.categories;
-			var hasRead = results.hasRead;
-			uid = parseInt(uid, 10);
-			for(var i=0; i<results.categories.length; ++i) {
-				if (categories[i]) {
-					categories[i]['unread-class'] = (parseInt(categories[i].topic_count, 10) === 0 || (hasRead[i] && uid !== 0)) ? '' : 'unread';
-					categories[i].children = results.children[i];
-					categories[i].parent = results.parents[i] || undefined;
-					calculateTopicPostCount(categories[i]);
+		
+		if ( stop && cacaca ){
+			callback(null, cacaca);
+		} else {
+			async.parallel({
+				categories: function(next) {
+					Categories.getCategoriesData(cids, next);
+				},
+				children: function(next) {
+					Categories.getChildren(cids, uid, next);
+				},
+				parents: function(next) {
+					Categories.getParents(cids, next);
+				},
+				hasRead: function(next) {
+					Categories.hasReadCategories(cids, uid, next);
 				}
-			}
+			}, function(err, results) {
+				if (err) {
+					return callback(err);
+				}
 
-			callback(null, categories);
-		});
+				var categories = results.categories;
+				var hasRead = results.hasRead;
+				uid = parseInt(uid, 10);
+				for(var i=0; i<results.categories.length; ++i) {
+					if (categories[i]) {
+						categories[i]['unread-class'] = (parseInt(categories[i].topic_count, 10) === 0 || (hasRead[i] && uid !== 0)) ? '' : 'unread';
+						categories[i].children = results.children[i];
+						categories[i].parent = results.parents[i] || undefined;
+						calculateTopicPostCount(categories[i]);
+					}
+				}
+				if (!cacaca && stop) cacaca = categories;
+				callback(null, categories);
+			});
+		}
 	};
 
 	function calculateTopicPostCount(category) {

@@ -334,7 +334,7 @@ middleware.processRender = function(req, res, next) {
 		if ('function' !== typeof fn) {
 			fn = defaultFn;
 		}
-
+		
 		if (res.locals.isAPI) {
 			if (req.route && req.route.path === '/api/') {
 				options.title = '[[pages:home]]';
@@ -457,7 +457,7 @@ function redirectToLogin(req, res) {
 
 
 function modifyTitle(obj) {
-	var title = controllers.helpers.buildTitle('[[pages:home]]');
+	var title = controllers.helpers.buildTitle(meta.config.title);
 	obj.browserTitle = title;
 
 	if (obj.metaTags) {

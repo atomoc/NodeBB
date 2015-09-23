@@ -12,9 +12,22 @@
 						<fieldset>
 							<label for="cid-{category.cid}-name">Category Name</label>
 							<input id="cid-{category.cid}-name" type="text" class="form-control" placeholder="Category Name" data-name="name" value="{category.name}" /><br />
-
+							
+							<label for="cid-{category.cid}-title">Title</label>
+							<input id="cid-{category.cid}-title" data-name="title" placeholder="Category Title" class="form-control category_title title" value="{category.title}" /><br />
+							
 							<label for="cid-{category.cid}-description">Category Description</label>
 							<input id="cid-{category.cid}-description" data-name="description" placeholder="Category Description" value="{category.description}" class="form-control category_description description"></input><br />
+							
+							<label for="cid-{category.cid}-metaDescription">Meta Description</label>
+							<textarea id="cid-{category.cid}-metaDescription" data-name="metaDescription" placeholder="Category Meta Description" class="form-control category_metaDescription metaDescription">{category.metaDescription}</textarea><br />
+							
+							<label for="cid-{category.cid}-metaKeywords">Meta Keywords</label>
+							<input id="cid-{category.cid}-metaKeywords" data-name="metaKeywords" placeholder="Category Meta Keywords" class="form-control category_metaKeywords metaKeywords" value="{category.metaKeywords}" /><br />
+							
+							<label for="cid-{category.cid}-content">Content</label>
+							<small><a class="text-muted" href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown supported <span class="help"><i class="fa fa-question-circle"></i></span></a></small>
+							<textarea id="cid-{category.cid}-content" data-name="content" placeholder="Category Content" class="form-control category_content content">{category.content}</textarea>
 						</fieldset>
 
 						<fieldset class="row">

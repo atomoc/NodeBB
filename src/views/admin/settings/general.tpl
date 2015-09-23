@@ -21,18 +21,22 @@
 			<p class="help-block">
 				If no browser title is specified, the site title will be used
 			</p>
-
+			
 			<label>Title Layout</label>
 			<input class="form-control" type="text" placeholder="Title Layout" data-field="titleLayout" />
 			<p class="help-block">
 				Define how the browser title will be structured ie. &#123;pageTitle&#125; | &#123;browserTitle&#125;
 			</p>
 
-			<label>Site Description</label>
-			<input type="text" class="form-control" placeholder="A short description about your community" data-field="description" /><br />
+			<label>Main Page Description</label>
+			<input type="text" class="form-control" placeholder="A short description about your community main page" data-field="description" /><br />
+			
+			<label>Main Page Content</label>
+			<a class="help-markdown" href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown supported <span class="help"><i class="fa fa-question-circle"></i></span></a>
+			<textarea type="text" class="form-control" placeholder="The text of the upper part of the main board page" data-field="content"></textarea><br />
 
-			<label>Site Keywords</label>
-			<input type="text" class="form-control" placeholder="Keywords describing your community, comma-separated" data-field="keywords" /><br />
+			<label>Main Page Keywords</label>
+			<input type="text" class="form-control" placeholder="Keywords describing your community main page, comma-seperated" data-field="keywords" /><br />
 		</form>
 	</div>
 </div>

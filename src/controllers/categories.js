@@ -13,7 +13,13 @@ var categoriesController = {},
 	plugins = require('../plugins'),
 	pagination = require('../pagination'),
 	helpers = require('./helpers'),
-	utils = require('../../public/src/utils');
+	utils = require('../../public/src/utils'),
+	
+	md = require('markdown-it')({
+		html: true,
+		linkify: true,
+		typographer: true
+	});
 
 
 categoriesController.list = function(req, res, next) {
@@ -64,12 +70,14 @@ categoriesController.list = function(req, res, next) {
 		if (err) {
 			return next(err);
 		}
-
+		
 		data.title = '[[pages:categories]]';
 		if (req.path.startsWith('/api/categories') || req.path.startsWith('/categories')) {
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: data.title}]);
 		}
 
+		if ( meta.config.content ) data.content = md.render(meta.config.content);
+		
 		plugins.fireHook('filter:categories.build', {req: req, res: res, templateData: data}, function(err, data) {
 			if (err) {
 				return next(err);
@@ -188,8 +196,13 @@ categoriesController.get = function(req, res, callback) {
 				if (err) {
 					return next(err);
 				}
-				categoryData.breadcrumbs = crumbs.concat(breadcrumbs);
-				next(null, categoryData);
+				plugins.fireHook('filter:breadcrumbs.build', crumbs.concat(breadcrumbs), function(err, crumbs) {
+					if (err) {
+						return next(err);
+					}
+					categoryData.breadcrumbs = crumbs;
+					next(null, categoryData);
+				});
 			});
 		},
 		function(categoryData, next) {
@@ -214,7 +227,11 @@ categoriesController.get = function(req, res, callback) {
 				},
 				{
 					name: 'description',
-					content: categoryData.description
+					content: categoryData.metaDescription || categoryData.description
+				},
+				{
+					name: 'keywords',
+					content: categoryData.metaKeywords || ''
 				},
 				{
 					property: "og:type",

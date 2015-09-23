@@ -97,7 +97,7 @@ sitemap.getDynamicUrls = function(callback) {
 					return next(err);
 				}
 
-				topics.forEach(function(topic) {
+				topics.forEach(function(topic) {console.log(topic)
 					if (topic) {
 						topicUrls.push({
 							url: '/topic/' + topic.slug,

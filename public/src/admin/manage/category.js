@@ -63,8 +63,8 @@ define('admin/manage/category', [
 			});
 		}
 
-
-		$('form.category input, form.category select')
+		
+		$('form.category').find('input,textarea,select')
 			.on('change', function(ev) {
 				modified(ev.target);
 			})

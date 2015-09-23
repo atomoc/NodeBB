@@ -34,6 +34,7 @@ module.exports = function(Meta) {
 					name: 'msapplication-square150x150logo',
 					content: Meta.config['brand:logo'] || ''
 				}];
+				if (meta) defaultTags.splice(4, 1);
 				plugins.fireHook('filter:meta.getMetaTags', defaultTags, next);
 			},
 			links: function(next) {
@@ -61,7 +62,7 @@ module.exports = function(Meta) {
 			addDescription(meta);
 
 			link = results.links.concat(link || []);
-
+			
 			callback(null, {
 				meta: meta,
 				link: link

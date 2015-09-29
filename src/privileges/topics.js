@@ -51,6 +51,7 @@ module.exports = function(privileges) {
 				editable: editable,
 				deletable: deletable,
 				view_deleted: isAdminOrMod || results.isOwner,
+				isAdminOrMod: isAdminOrMod,
 				disabled: disabled,
 				tid: tid,
 				uid: uid
@@ -86,7 +87,7 @@ module.exports = function(privileges) {
 
 				async.parallel({
 					categories: function(next) {
-						categories.getMultipleCategoryFields(cids, ['disabled'], next);
+						categories.getCategoriesFields(cids, ['disabled'], next);
 					},
 					allowedTo: function(next) {
 						helpers.isUserAllowedTo(privilege, uid, cids, next);
@@ -189,7 +190,6 @@ module.exports = function(privileges) {
 	};
 
 	privileges.topics.canEdit = function(tid, uid, callback) {
-		winston.warn('[deprecated] please use privileges.topics.isOwnerOrAdminOrMod');
 		privileges.topics.isOwnerOrAdminOrMod(tid, uid, callback);
 	};
 
@@ -204,10 +204,6 @@ module.exports = function(privileges) {
 		], callback);
 	};
 
-	privileges.topics.canMove = function(tid, uid, callback) {
-		winston.warn('[deprecated] please use privileges.topics.isAdminOrMod');
-		privileges.topics.isAdminOrMod(tid, uid, callback);
-	};
 
 	privileges.topics.isAdminOrMod = function(tid, uid, callback) {
 		helpers.some([

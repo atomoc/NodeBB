@@ -10,7 +10,6 @@ var	fs = require('fs'),
 	Plugins = require('./plugins'),
 	meta = require('./meta'),
 	translator = require('../public/src/modules/translator'),
-	tjs = require('templates.js'),
 
 	app;
 
@@ -115,7 +114,9 @@ var	fs = require('fs'),
 			function (data, next) {
 				Plugins.fireHook('filter:email.send', data, next);
 			}
-		], callback);
+		], function (err, data) {
+			callback(err);
+		});
 	};
 
 

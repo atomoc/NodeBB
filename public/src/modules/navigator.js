@@ -91,7 +91,7 @@ define('navigator', ['forum/pagination', 'components'], function(pagination, com
 		toggle(!!count);
 
 		var middleOfViewport = $(window).scrollTop() + $(window).height() / 2;
-		
+
 		index = parseInt($(navigator.selector).first().attr('data-index'), 10);
 
 		$(navigator.selector).each(function() {
@@ -111,7 +111,7 @@ define('navigator', ['forum/pagination', 'components'], function(pagination, com
 	navigator.updateTextAndProgressBar = function() {
 		index = index > count ? count : index;
 
-		$('#pagination').translateHtml('[[global:pagination.out_of, ' + index + ', ' + count + ']]');
+		$('.pagination-block .pagination-text').translateHtml('[[global:pagination.out_of, ' + index + ', ' + count + ']]');
 		$('.pagination-block .progress-bar').width((index / count * 100) + '%');
 	};
 
@@ -162,7 +162,7 @@ define('navigator', ['forum/pagination', 'components'], function(pagination, com
 		if (config.usePagination) {
 			var page = Math.max(1, Math.ceil(postIndex / config.postsPerPage));
 
-			if (parseInt(page, 10) !== pagination.currentPage) {
+			if (parseInt(page, 10) !== ajaxify.data.pagination.currentPage) {
 				pagination.loadPage(page, function() {
 					navigator.scrollToPostIndex(postIndex, highlight, duration);
 				});

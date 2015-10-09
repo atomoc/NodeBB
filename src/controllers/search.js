@@ -51,6 +51,7 @@ searchController.search = function(req, res, next) {
 		searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
 		searchData.showAsPosts = !req.query.showAs || req.query.showAs === 'posts';
 		searchData.showAsTopics = req.query.showAs === 'topics';
+		searchData.title = '[[global:header.search]]';
 		searchData.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:search]]'}]);
 		searchData.expandSearch = !req.params.term;
 
@@ -75,7 +76,7 @@ function buildCategories(uid, callback) {
 		];
 
 		categories = categories.filter(function(category) {
-			return !category.link && !parseInt(category.parentCid, 10);
+			return category && !category.link && !parseInt(category.parentCid, 10);
 		});
 
 		categories.forEach(function(category) {

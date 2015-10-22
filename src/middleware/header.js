@@ -144,7 +144,7 @@ module.exports = function(app, middleware) {
 
 
 	function modifyTitle(obj) {
-		var title = controllers.helpers.buildTitle('[[pages:home]]');
+		var title = controllers.helpers.buildTitle(meta.config.title || '[[pages:home]]');
 		obj.browserTitle = title;
 
 		if (obj.metaTags) {

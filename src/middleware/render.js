@@ -1,6 +1,7 @@
 'use strict';
 
-var nconf = require('nconf');
+var nconf = require('nconf'),
+	meta = require('../meta');
 var translator = require('../../public/src/modules/translator');
 
 module.exports = function(middleware) {
@@ -35,7 +36,7 @@ module.exports = function(middleware) {
 
 			if (res.locals.isAPI) {
 				if (req.route && req.route.path === '/api/') {
-					options.title = '[[pages:home]]';
+					options.title = meta.config.title || '[[pages:home]]';
 				}
 
 				return res.json(options);

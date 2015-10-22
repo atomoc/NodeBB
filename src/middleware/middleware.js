@@ -209,32 +209,12 @@ middleware.requireUser = function(req, res, next) {
 	res.render('403', {title: '[[global:403.title]]'});
 };
 
-<<<<<<< HEAD
-function redirectToLogin(req, res) {
-	req.session.returnTo = nconf.get('relative_path') + req.url.replace(/^\/api/, '');
-	return controllers.helpers.redirect(res, '/login');
-}
-
-
-
-function modifyTitle(obj) {
-	var title = controllers.helpers.buildTitle(meta.config.title || '[[pages:home]]');
-	obj.browserTitle = title;
-
-	if (obj.metaTags) {
-		obj.metaTags.forEach(function(tag, i) {
-			if (tag.property === 'og:title') {
-				obj.metaTags[i].content = title;
-			}
-		});
-=======
 middleware.privateUploads = function(req, res, next) {
 	if (req.user || parseInt(meta.config.privateUploads, 10) !== 1) {
 		return next();
 	}
 	if (req.path.startsWith('/uploads/files')) {
 		return res.status(403).json('not-allowed');
->>>>>>> 8e80eca449db260f22e4e980d61d2d83cd5ca807
 	}
 	next();
 };

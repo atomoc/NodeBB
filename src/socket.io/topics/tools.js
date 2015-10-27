@@ -3,10 +3,45 @@
 var async = require('async');
 var topics = require('../../topics');
 var events = require('../../events');
+var privileges = require('../../privileges');
+var plugins = require('../../plugins');
 var socketHelpers = require('../helpers');
 
 module.exports = function(SocketTopics) {
 
+	SocketTopics.loadTopicTools = function(socket, data, callback) {
+		if (!socket.uid) {
+			return;
+		}
+		if (!data) {
+			return callback(new Error('[[error:invalid-data]]'));
+		}
+		var topic;
+		async.waterfall([
+			function (next) {
+				async.parallel({
+					topic: function(next) {
+						topics.getTopicData(data.tid, next);
+					},
+					privileges: function(next) {
+						privileges.topics.get(data.tid, socket.uid, next);
+					}
+				}, next);
+			},
+			function (results, next) {
+				topic = results.topic;
+				topic.privileges = results.privileges;
+				plugins.fireHook('filter:topic.thread_tools', {topic: results.topic, uid: socket.uid, tools: []}, next);
+			},
+			function (data, next) {
+				topic.deleted = parseInt(topic.deleted, 10) === 1;
+				topic.locked = parseInt(topic.locked, 10) === 1;
+				topic.pinned = parseInt(topic.pinned, 10) === 1;
+				topic.thread_tools = data.tools;
+				next(null, topic);
+			}
+		], callback);
+	};
 
 	SocketTopics.delete = function(socket, data, callback) {
 		SocketTopics.doTopicAction('delete', 'event:topic_deleted', socket, data, callback);

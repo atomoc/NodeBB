@@ -24,7 +24,10 @@ module.exports = function(Categories) {
 				category = {
 					cid: cid,
 					name: data.name,
-					description: ( data.description ? data.description : '' ),
+					title: data.title,
+					metaDescription: data.metaDescription,
+					content: data.content,
+					description: ( data.description || '' ),
 					icon: ( data.icon ? data.icon : '' ),
 					bgColor: data.bgColor || colours[0],
 					color: data.color || colours[1],

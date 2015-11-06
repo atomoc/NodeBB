@@ -24,6 +24,9 @@
     "chats": "گفتگوها",
     "chat": "گفتگو با %1",
     "account/edit": "ویرایش \"%1\"",
+    "account/edit/password": "Editing password of \"%1\"",
+    "account/edit/username": "Editing username of \"%1\"",
+    "account/edit/email": "Editing email of \"%1\"",
     "account/following": "کاربرانی که %1 دنبال می‌کند",
     "account/followers": "کاربرانی که %1 را دنبال می‌کنند",
     "account/posts": "دیدگاه‌های %1",
@@ -33,5 +36,6 @@
     "account/settings": "تنظیمات کاربر",
     "account/watched": "Topics watched by %1",
     "maintenance.text": "1% در حال حاضر تحت تعمیر و نگهدارییست. لطفا زمان دیگری مراجعه کنید.",
-    "maintenance.messageIntro": "علاوه بر این، مدیر این پیام را گذاشته است:"
+    "maintenance.messageIntro": "علاوه بر این، مدیر این پیام را گذاشته است:",
+    "throttled.text": "%1 is currently unavailable due to excessive load. Please come back another time."
 }

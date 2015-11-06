@@ -62,7 +62,6 @@ function userRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/users/sort-posts', middleware, middlewares, controllers.users.getUsersSortedByPosts);
 	setupPageRoute(app, '/users/sort-reputation', middleware, middlewares, controllers.users.getUsersSortedByReputation);
 	setupPageRoute(app, '/users/search', middleware, middlewares, controllers.users.getUsersForSearch);
-	setupPageRoute(app, '/users/map', middleware, middlewares, controllers.users.getMap);
  }
 
 
@@ -82,6 +81,9 @@ module.exports = function(app, middleware) {
 		ensureLoggedIn = require('connect-ensure-login');
 
 	pluginRouter.render = function() {
+		app.render.apply(app, arguments);
+	};
+	controllers.render = function() {
 		app.render.apply(app, arguments);
 	};
 

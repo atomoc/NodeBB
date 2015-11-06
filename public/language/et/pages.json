@@ -24,6 +24,9 @@
     "chats": "Vestlused",
     "chat": "Vestlus kasutajaga %1",
     "account/edit": "Muudan \"%1\"",
+    "account/edit/password": "Editing password of \"%1\"",
+    "account/edit/username": "Editing username of \"%1\"",
+    "account/edit/email": "Editing email of \"%1\"",
     "account/following": "Kasutaja %1 jälgib",
     "account/followers": "Kasutajad, kes jälgivad %1",
     "account/posts": "Postitused, mis on tehtud kasutaja %1 poolt",
@@ -33,5 +36,6 @@
     "account/settings": "Kasutaja sätted",
     "account/watched": "Teemasid jälgib %1 kasutajat",
     "maintenance.text": "%1 foorumil on käimas hooldustööd. Palun külastage meid mõne aja pärast uuesti.",
-    "maintenance.messageIntro": "Administraator on jätnud ka omaltpoolt sõnumi:"
+    "maintenance.messageIntro": "Administraator on jätnud ka omaltpoolt sõnumi:",
+    "throttled.text": "%1 is currently unavailable due to excessive load. Please come back another time."
 }

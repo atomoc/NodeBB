@@ -24,7 +24,6 @@ module.exports = function(User) {
 			if (err)  {
 				return callback(err);
 			}
-			var gravatar = User.createGravatarURLFromEmail(data.email);
 			var timestamp = data.timestamp || Date.now();
 
 			var userData = {
@@ -32,8 +31,7 @@ module.exports = function(User) {
 				'userslug': data.userslug,
 				'email': data.email,
 				'joindate': timestamp,
-				'picture': gravatar,
-				'gravatarpicture': gravatar,
+				'picture': '',
 				'fullname': '',
 				'location': '',
 				'birthday': '',

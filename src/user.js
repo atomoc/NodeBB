@@ -1,12 +1,9 @@
 'use strict';
 
 var	async = require('async'),
-	nconf = require('nconf'),
-	gravatar = require('gravatar'),
 
 	plugins = require('./plugins'),
 	db = require('./database'),
-	meta = require('./meta'),
 	topics = require('./topics'),
 	privileges = require('./privileges'),
 	utils = require('../public/src/utils');
@@ -91,71 +88,57 @@ var	async = require('async'),
 	};
 
 	User.getUsers = function(uids, uid, callback) {
-		var fields = ['uid', 'username', 'userslug', 'picture', 'status', 'banned', 'joindate', 'postcount', 'reputation', 'email:confirmed'];
-		plugins.fireHook('filter:users.addFields', {fields: fields}, function(err, data) {
+		var fields = ['uid', 'username', 'userslug', 'picture', 'status', 'banned', 'joindate', 'postcount', 'reputation', 'email:confirmed', 'lastonline'];
+
+		async.waterfall([
+			function (next) {
+				plugins.fireHook('filter:users.addFields', {fields: fields}, next);
+			},
+			function (data, next) {
+				data.fields = data.fields.filter(function(field, index, array) {
+					return array.indexOf(field) === index;
+				});
+
+				async.parallel({
+					userData: function(next) {
+						User.getUsersFields(uids, data.fields, next);
+					},
+					isAdmin: function(next) {
+						User.isAdministrator(uids, next);
+					}
+				}, next);
+			},
+			function (results, next) {
+				results.userData.forEach(function(user, index) {
+					if (user) {
+						user.status = User.getStatus(user);
+						user.joindateISO = utils.toISOString(user.joindate);
+						user.administrator = results.isAdmin[index];
+						user.banned = parseInt(user.banned, 10) === 1;
+						user['email:confirmed'] = parseInt(user['email:confirmed'], 10) === 1;
+					}
+				});
+				plugins.fireHook('filter:userlist.get', {users: results.userData, uid: uid}, next);
+			},
+			function (data, next) {
+				next(null, data.users);
+			}
+		], callback);
+	};
+
+	User.getStatus = function(userData) {
+		var isOnline = Date.now() - parseInt(userData.lastonline, 10) < 300000;
+		return isOnline ? (userData.status || 'online') : 'offline';
+	};
+
+	User.isOnline = function(uid, callback) {
+		db.sortedSetScore('users:online', uid, function(err, lastonline) {
 			if (err) {
 				return callback(err);
 			}
-			data.fields = data.fields.filter(function(field, index, array) {
-				return array.indexOf(field) === index;
-			});
-			async.parallel({
-				userData: function(next) {
-					User.getUsersFields(uids, data.fields, next);
-				},
-				isAdmin: function(next) {
-					User.isAdministrator(uids, next);
-				},
-				isOnline: function(next) {
-					require('./socket.io').isUsersOnline(uids, next);
-				}
-			}, function(err, results) {
-				if (err) {
-					return callback(err);
-				}
-
-				results.userData.forEach(function(user, index) {
-					if (!user) {
-						return;
-					}
-					user.status = User.getStatus(user.status, results.isOnline[index]);
-					user.joindateISO = utils.toISOString(user.joindate);
-					user.administrator = results.isAdmin[index];
-					user.banned = parseInt(user.banned, 10) === 1;
-					user['email:confirmed'] = parseInt(user['email:confirmed'], 10) === 1;
-				});
-
-				plugins.fireHook('filter:userlist.get', {users: results.userData, uid: uid}, function(err, data) {
-					if (err) {
-						return callback(err);
-					}
-					callback(null, data.users);
-				});
-			});
+			var isOnline = Date.now() - parseInt(lastonline, 10) < 300000;
+			callback(null, isOnline);
 		});
-	};
-
-	User.getStatus = function(status, isOnline) {
-		return isOnline ? (status || 'online') : 'offline';
-	};
-
-	User.createGravatarURLFromEmail = function(email) {
-		var customGravatarDefaultImage = meta.config.customGravatarDefaultImage;
-		if (customGravatarDefaultImage && customGravatarDefaultImage.indexOf('http') === -1) {
-			customGravatarDefaultImage = nconf.get('url') + meta.config.customGravatarDefaultImage;
-		}
-
-		var options = {
-			size: parseInt(meta.config.profileImageDimension, 10) || 128,
-			default: customGravatarDefaultImage || meta.config.defaultGravatarImage || 'identicon',
-			rating: 'pg'
-		};
-
-		if (!email) {
-			email = '';
-		}
-
-		return gravatar.url(email, options, true);
 	};
 
 	User.exists = function(uid, callback) {

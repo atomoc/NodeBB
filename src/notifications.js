@@ -56,7 +56,7 @@ var async = require('async'),
 						if (err) {
 							return next(err);
 						}
-						notification.image = userData.picture;
+						notification.image = userData.picture || null;
 						notification.user = userData;
 						next(null, notification);
 					});

@@ -24,6 +24,9 @@
     "chats": "Chats",
     "chat": "Chatten met %1",
     "account/edit": "\"%1\" aanpassen",
+    "account/edit/password": "Wachtwoord van \"%1\" aanpassen",
+    "account/edit/username": "Gebruikersnaam van \"%1\" aanpassen",
+    "account/edit/email": "Email van \"%1\" aanpassen",
     "account/following": "Door %1 gevolgd",
     "account/followers": "Die %1 volgen",
     "account/posts": "Berichten geplaatst door %1",
@@ -33,5 +36,6 @@
     "account/settings": "Gebruikersinstellingen",
     "account/watched": "Berichten die door %1 bekeken worden",
     "maintenance.text": "%1 is momenteel in onderhoud. Excuses voor het ongemak en probeer het later nog eens",
-    "maintenance.messageIntro": "Daarnaast heeft de beheerder het volgende bericht achtergelaten:"
+    "maintenance.messageIntro": "Daarnaast heeft de beheerder het volgende bericht achtergelaten:",
+    "throttled.text": "%1 is currently unavailable due to excessive load. Please come back another time."
 }

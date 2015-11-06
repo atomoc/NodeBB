@@ -24,6 +24,9 @@
     "chats": "Chats",
     "chat": "Chateando con %1",
     "account/edit": "Editando \"%1\"",
+    "account/edit/password": "Editar contraseña de \"%1\"",
+    "account/edit/username": "Editar nombre de usuario de \"%1\"",
+    "account/edit/email": "Editar email \"%1\"",
     "account/following": "Gente que sigue %1",
     "account/followers": "Seguidores de %1",
     "account/posts": "Publicados por %1",
@@ -33,5 +36,6 @@
     "account/settings": "Preferencias",
     "account/watched": "Temas seguidos por %1",
     "maintenance.text": "%1 está en mantenimiento actualmente. Por favor vuelva en otro momento.",
-    "maintenance.messageIntro": "Adicionalmente, la administración ha dejado este mensaje:"
+    "maintenance.messageIntro": "Adicionalmente, la administración ha dejado este mensaje:",
+    "throttled.text": "%1 is currently unavailable due to excessive load. Please come back another time."
 }

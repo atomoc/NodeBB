@@ -77,7 +77,7 @@ module.exports = function(app, middleware) {
 					next(null, {
 						username: '[[global:guest]]',
 						userslug: '',
-						picture: user.createGravatarURLFromEmail(''),
+						picture: meta.config.defaultAvatar,
 						status: 'offline',
 						banned: false,
 						uid: 0

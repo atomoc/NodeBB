@@ -10,6 +10,7 @@ var async = require('async'),
 	posts = require('../posts'),
 	topics = require('../topics'),
 	plugins = require('../plugins'),
+	sitemap = require('../sitemap'),
 	categories = require('../categories'),
 	privileges = require('../privileges'),
 	helpers = require('./helpers');
@@ -32,22 +33,27 @@ var Controllers = {
 
 
 Controllers.home = function(req, res, next) {
-	var route = meta.config.homePageRoute || meta.config.homePageCustom || 'categories',
-		hook = 'action:homepage.get:' + route;
+	var route = meta.config.homePageRoute || meta.config.homePageCustom || 'categories';
 
-	if (plugins.hasListeners(hook)) {
-		plugins.fireHook(hook, {req: req, res: res, next: next});
-	} else {
-		if (route === 'categories' || route === '/') {
-			Controllers.categories.list(req, res, next);
-		} else if (route === 'recent') {
-			Controllers.recent.get(req, res, next);
-		} else if (route === 'popular') {
-			Controllers.popular.get(req, res, next);
+	user.getSettings(req.uid, function(err, settings) {
+		if (!err && settings.homePageRoute !== 'undefined' && settings.homePageRoute !== 'none') route = settings.homePageRoute || route;
+
+		var hook = 'action:homepage.get:' + route;
+
+		if (plugins.hasListeners(hook)) {
+			plugins.fireHook(hook, {req: req, res: res, next: next});
 		} else {
-			res.redirect(route);
+			if (route === 'categories' || route === '/') {
+				Controllers.categories.list(req, res, next);
+			} else if (route === 'recent') {
+				Controllers.recent.get(req, res, next);
+			} else if (route === 'popular') {
+				Controllers.popular.get(req, res, next);
+			} else {
+				res.redirect(route);
+			}
 		}
-	}
+	});
 };
 
 Controllers.reset = function(req, res, next) {
@@ -112,7 +118,7 @@ Controllers.register = function(req, res, next) {
 			}
 		},
 		function(next) {
-			plugins.fireHook('filter:parse.post', {postData: {content: meta.config.termsOfUse}}, next);
+			plugins.fireHook('filter:parse.post', {postData: {content: meta.config.termsOfUse || ''}}, next);
 		},
 		function(tos, next) {
 			var loginStrategies = require('../routes/authentication').getLoginStrategies();
@@ -161,17 +167,56 @@ Controllers.confirmEmail = function(req, res, next) {
 	});
 };
 
-Controllers.sitemap = function(req, res, next) {
+Controllers.sitemap = {};
+Controllers.sitemap.render = function(req, res, next) {
+	sitemap.render(function(err, tplData) {
+		Controllers.render('sitemap', tplData, function(err, xml) {
+			res.header('Content-Type', 'application/xml');
+			res.send(xml);
+		});
+	})
+};
+
+Controllers.sitemap.getPages = function(req, res, next) {
 	if (parseInt(meta.config['feeds:disableSitemap'], 10) === 1) {
 		return next();
 	}
 
-	var sitemap = require('../sitemap.js');
-
-	sitemap.render(function(err, xml) {
+	sitemap.getPages(function(err, xml) {
 		if (err) {
 			return next(err);
 		}
+		res.header('Content-Type', 'application/xml');
+		res.send(xml);
+	});
+};
+
+Controllers.sitemap.getCategories = function(req, res, next) {
+	if (parseInt(meta.config['feeds:disableSitemap'], 10) === 1) {
+		return next();
+	}
+
+	sitemap.getCategories(function(err, xml) {
+		if (err) {
+			return next(err);
+		}
+		res.header('Content-Type', 'application/xml');
+		res.send(xml);
+	});
+};
+
+Controllers.sitemap.getTopicPage = function(req, res, next) {
+	if (parseInt(meta.config['feeds:disableSitemap'], 10) === 1) {
+		return next();
+	}
+
+	sitemap.getTopicPage(parseInt(req.params[0], 10), function(err, xml) {
+		if (err) {
+			return next(err);
+		} else if (!xml) {
+			return next();
+		}
+
 		res.header('Content-Type', 'application/xml');
 		res.send(xml);
 	});

@@ -130,22 +130,21 @@ app.cacheBuster = null;
 
 	app.enterRoom = function (room, callback) {
 		callback = callback || function() {};
-		if (socket) {
-			if (app.currentRoom === room) {
-				return;
-			}
-
+		if (socket && app.user.uid && app.currentRoom !== room) {
 			socket.emit('meta.rooms.enter', {
 				enter: room,
 				username: app.user.username,
 				userslug: app.user.userslug,
 				picture: app.user.picture,
-				status: app.user.status
+				status: app.user.status,
+				'icon:bgColor': app.user['icon:bgColor'],
+				'icon:text': app.user['icon:text']
 			}, function(err) {
 				if (err) {
 					return app.alertError(err.message);
 				}
 				app.currentRoom = room;
+				callback();
 			});
 		}
 	};
@@ -172,19 +171,23 @@ app.cacheBuster = null;
 
 	app.createUserTooltips = function(els) {
 		els = els || $('body');
-		els.find('img[title].teaser-pic,img[title].user-img').each(function() {
-			$(this).tooltip({
-				placement: 'top',
-				title: $(this).attr('title')
-			});
+		els.find('img[title].teaser-pic,img[title].user-img,div.user-icon,span.user-icon').each(function() {
+			if (!utils.isTouchDevice()) {
+				$(this).tooltip({
+					placement: 'top',
+					title: $(this).attr('title')
+				});
+			}
 		});
 	};
 
 	app.createStatusTooltips = function() {
-		$('body').tooltip({
-			selector:'.fa-circle.status',
-			placement: 'top'
-		});
+		if (!utils.isTouchDevice()) {
+			$('body').tooltip({
+				selector:'.fa-circle.status',
+				placement: 'top'
+			});
+		}
 	};
 
 	app.replaceSelfLinks = function(selector) {
@@ -330,21 +333,27 @@ app.cacheBuster = null;
 			return;
 		}
 		$('#header-menu li a[title]').each(function() {
-			$(this).tooltip({
+			if (!utils.isTouchDevice()) {
+				$(this).tooltip({
+					placement: 'bottom',
+					title: $(this).attr('title')
+				});
+			}
+		});
+
+		if (!utils.isTouchDevice()) {
+			$('#search-form').parent().tooltip({
 				placement: 'bottom',
-				title: $(this).attr('title')
+				title: $('#search-button i').attr('title')
 			});
-		});
+		}
 
-		$('#search-form').parent().tooltip({
-			placement: 'bottom',
-			title: $('#search-button i').attr('title')
-		});
-
-		$('#user_dropdown').tooltip({
-			placement: 'bottom',
-			title: $('#user_dropdown').attr('title')
-		});
+		if (!utils.isTouchDevice()) {
+			$('#user_dropdown').tooltip({
+				placement: 'bottom',
+				title: $('#user_dropdown').attr('title')
+			});
+		}
 	}
 
 	app.handleSearch = function () {
@@ -360,8 +369,8 @@ app.cacheBuster = null;
 		searchInput.on('blur', dismissSearch);
 
 		function dismissSearch(){
-			searchFields.addClass('hide');
-			searchButton.show();
+			searchFields.addClass('hidden');
+			searchButton.removeClass('hidden');
 		}
 
 		searchButton.on('click', function(e) {
@@ -391,8 +400,8 @@ app.cacheBuster = null;
 	};
 
 	app.prepareSearch = function() {
-		$("#search-fields").removeClass('hide');
-		$("#search-button").hide();
+		$("#search-fields").removeClass('hidden');
+		$("#search-button").addClass('hidden');
 		$('#search-fields input').focus();
 	};
 
@@ -495,5 +504,20 @@ app.cacheBuster = null;
 		}
 	};
 
-
+	app.parseAndTranslate = function(template, blockName, data, callback) {
+		if (typeof blockName === 'string') {
+			templates.parse(template, blockName, data, function(html) {
+				translator.translate(html, function(translatedHTML) {
+					callback($(translatedHTML));
+				});
+			});
+		} else {
+			callback = data, data = blockName;
+			templates.parse(template, data, function(html) {
+				translator.translate(html, function(translatedHTML) {
+					callback($(translatedHTML));
+				});
+			});
+		}
+	};
 }());

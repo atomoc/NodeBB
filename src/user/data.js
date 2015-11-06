@@ -9,6 +9,9 @@ var plugins = require('../plugins');
 
 module.exports = function(User) {
 
+	var iconBackgrounds = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3',
+		'#009688', '#1b5e20', '#33691e', '#827717', '#e65100', '#ff5722', '#795548', '#607d8b'];
+
 	User.getUserField = function(uid, field, callback) {
 		User.getUserFields(uid, [field], function(err, user) {
 			callback(err, user ? user[field] : null);
@@ -44,7 +47,6 @@ module.exports = function(User) {
 
 		if (fields.indexOf('picture') !== -1) {
 			addField('email');
-			addField('gravatarpicture');
 			addField('uploadedpicture');
 		}
 
@@ -102,19 +104,25 @@ module.exports = function(User) {
 				user.uid = 0;
 				user.username = '[[global:guest]]';
 				user.userslug = '';
-				user.picture = User.createGravatarURLFromEmail('');
+				user.picture = '';
 			}
 
-			if (user.picture) {
-				if (user.picture === user.uploadedpicture) {
-					user.picture = user.uploadedpicture = user.picture.startsWith('http') ? user.picture : nconf.get('relative_path') + user.picture;
-				} else {
-					user.picture = User.createGravatarURLFromEmail(user.email);
-				}
+			if (user.picture && user.picture === user.uploadedpicture) {
+				user.picture = user.uploadedpicture = user.picture.startsWith('http') ? user.picture : nconf.get('relative_path') + user.picture;
+			} else if (user.uploadedpicture) {
+				user.uploadedpicture = user.uploadedpicture.startsWith('http') ? user.uploadedpicture : nconf.get('relative_path') + user.uploadedpicture;
 			}
 
 			for(var i=0; i<fieldsToRemove.length; ++i) {
 				user[fieldsToRemove[i]] = undefined;
+			}
+
+			// User Icons
+			if (user.hasOwnProperty('picture') && user.username) {
+				user['icon:text'] = (user.username[0] || '').toUpperCase();
+				user['icon:bgColor'] = iconBackgrounds[Array.prototype.reduce.call(user.username, function(cur, next) {
+					return cur + next.charCodeAt();
+				}, 0) % iconBackgrounds.length];
 			}
 		});
 

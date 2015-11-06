@@ -23,6 +23,34 @@ module.exports = function(SocketUser) {
 		], callback);
 	};
 
+	SocketUser.updateCover = function(socket, data, callback) {
+		if (!socket.uid) {
+			return callback(new Error('[[error:no-privileges]]'));
+		}
+
+		user.isAdministrator(socket.uid, function(err, isAdmin) {
+			if (!isAdmin && data.uid !== socket.uid) {
+				return callback(new Error('[[error:no-privileges]]'));
+			}
+
+			user.updateCoverPicture(data, callback);
+		});
+	};
+
+	SocketUser.removeCover = function(socket, data, callback) {
+		if (!socket.uid) {
+			return callback(new Error('[[error:no-privileges]]'));
+		}
+
+		user.isAdministrator(socket.uid, function(err, isAdmin) {
+			if (!isAdmin && data.uid !== socket.uid) {
+				return callback(new Error('[[error:no-privileges]]'));
+			}
+
+			user.removeCoverPicture(data, callback);
+		});
+	};
+
 	function isAdminOrSelfAndPasswordMatch(uid, data, callback) {
 		async.parallel({
 			isAdmin: async.apply(user.isAdministrator, uid),

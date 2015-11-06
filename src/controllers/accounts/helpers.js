@@ -3,6 +3,7 @@
 
 var async = require('async'),
 	validator = require('validator'),
+	nconf = require('nconf'),
 
 	user = require('../../user'),
 	groups = require('../../groups'),
@@ -57,7 +58,7 @@ helpers.getUserDataByUserSlug = function(userslug, callerUID, callback) {
 			var self = parseInt(callerUID, 10) === parseInt(userData.uid, 10);
 
 			userData.joindate = utils.toISOString(userData.joindate);
-			userData.lastonline = userData.lastonline ? utils.toISOString(userData.lastonline) : userData.joindate;
+			userData.lastonlineISO = utils.toISOString(userData.lastonline || userData.joindate);
 			userData.age = userData.birthday ? Math.floor((new Date().getTime() - new Date(userData.birthday).getTime()) / 31536000000) : '';
 
 			if (!(isAdmin || self || (userData.email && userSettings.showemail))) {
@@ -83,9 +84,9 @@ helpers.getUserDataByUserSlug = function(userslug, callerUID, callback) {
 			userData.groups = Array.isArray(results.groups) && results.groups.length ? results.groups[0] : [];
 			userData.disableSignatures = meta.config.disableSignatures !== undefined && parseInt(meta.config.disableSignatures, 10) === 1;
 			userData['email:confirmed'] = !!parseInt(userData['email:confirmed'], 10);
-			userData.profile_links = results.profile_links;
+			userData.profile_links = filterLinks(results.profile_links, self);
 			userData.sso = results.sso.associations;
-			userData.status = require('../../socket.io').isUserOnline(userData.uid) ? (userData.status || 'online') : 'offline';
+			userData.status = user.getStatus(userData);
 			userData.banned = parseInt(userData.banned, 10) === 1;
 			userData.website = validator.escape(userData.website);
 			userData.websiteLink = !userData.website.startsWith('http') ? 'http://' + userData.website : userData.website;
@@ -99,6 +100,9 @@ helpers.getUserDataByUserSlug = function(userslug, callerUID, callback) {
 			userData.location = validator.escape(userData.location);
 			userData.signature = validator.escape(userData.signature);
 			userData.aboutme = validator.escape(userData.aboutme || '');
+
+			userData['cover:url'] = userData['cover:url'] || require('../../coverPhoto').getDefaultProfileCover(userData.uid);
+			userData['cover:position'] = userData['cover:position'] || '50% 50%';
 
 			next(null, userData);
 		}
@@ -118,7 +122,7 @@ helpers.getBaseUser = function(userslug, callerUID, callback) {
 
 			async.parallel({
 				user: function(next) {
-					user.getUserFields(uid, ['uid', 'username', 'userslug'], next);
+					user.getUserFields(uid, ['uid', 'username', 'userslug', 'picture', 'cover:url', 'cover:position', 'status', 'lastonline'], next);
 				},
 				isAdmin: function(next) {
 					user.isAdministrator(callerUID, next);
@@ -135,12 +139,23 @@ helpers.getBaseUser = function(userslug, callerUID, callback) {
 
 			results.user.yourid = callerUID;
 			results.user.theirid = results.user.uid;
+			results.user.status = user.getStatus(results.user);
 			results.user.isSelf = parseInt(callerUID, 10) === parseInt(results.user.uid, 10);
 			results.user.showHidden = results.user.isSelf || results.isAdmin;
-			results.user.profile_links = results.profile_links;
+			results.user.profile_links = filterLinks(results.profile_links, results.user.isSelf);
+
+			results.user['cover:url'] = results.user['cover:url'] || require('../../coverPhoto').getDefaultProfileCover(results.user.uid);
+			results.user['cover:position'] = results.user['cover:position'] || '50% 50%';
+
 			next(null, results.user);
 		}
 	], callback);
 };
+
+function filterLinks(links, self) {
+	return links.filter(function(link) {
+		return link && (link.public || self);
+	});
+}
 
 module.exports = helpers;

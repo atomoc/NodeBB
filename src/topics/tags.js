@@ -24,7 +24,6 @@ module.exports = function(Topics) {
 			},
 			function (data, next) {
 				tags = data.tags.slice(0, meta.config.maximumTagsPerTopic || 5);
-
 				tags = tags.map(Topics.cleanUpTag).filter(function(tag) {
 					return tag && tag.length >= (meta.config.minimumTagLength || 3);
 				});

@@ -167,6 +167,30 @@
 		return locale.replace('_', '-');
 	};
 
+	helpers.renderTopicImage = function(topicObj) {
+		if (topicObj.thumb) {
+			return '<img src="' + topicObj.thumb + '" class="img-circle user-img" title="' + topicObj.user.username + '" />';
+		} else {
+			return '<img component="user/picture" data-uid="' + topicObj.user.uid + '" src="' + topicObj.user.picture + '" class="user-img" title="' + topicObj.user.username + '" />';
+		}
+	};
+
+	helpers.renderDigestAvatar = function(block) {
+		if (block.teaser) {
+			if (block.teaser.user.picture) {
+				return '<img style="vertical-align: middle; width: 16px; height: 16px; padding-right: 1em;" src="' + block.teaser.user.picture + '" title="' + block.teaser.user.username + '" />';
+			} else {
+				return '<div style="width: 16px; height: 16px; line-height: 16px; font-size: 10px; margin-right: 1em; background-color: ' + block.teaser.user['icon:bgColor'] + '; color: white; text-align: center; display: inline-block;">' + block.teaser.user['icon:text'] + '</div>';
+			}
+		} else {
+			if (block.user.picture) {
+				return '<img style="vertical-align: middle; width: 16px; height: 16px; padding-right: 1em;" src="' + block.user.picture + '" title="' + block.user.username + '" />';
+			} else {
+				return '<div style="width: 16px; height: 16px; line-height: 16px; font-size: 10px; margin-right: 1em; background-color: ' + block.user['icon:bgColor'] + '; color: white; text-align: center; display: inline-block;">' + block.user['icon:text'] + '</div>';
+			}
+		}
+	};
+
 	exports.register = function() {
 		var templates;
 

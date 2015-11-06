@@ -30,9 +30,9 @@
 	"following": "Following",
 	"aboutme": "About me",
 	"signature": "Signature",
-	"gravatar": "Gravatar",
 	"birthday": "Birthday",
 	"chat": "Chat",
+	"chat_with": "Chat with %1",
 	"follow": "Follow",
 	"unfollow": "Unfollow",
 	"more": "More",
@@ -42,6 +42,7 @@
 	"change_username": "Change Username",
 	"change_email": "Change Email",
 	"edit": "Edit",
+	"default_picture": "Default Icon",
 	"uploaded_picture": "Uploaded Picture",
 	"upload_new_picture": "Upload New Picture",
 	"upload_new_picture_from_url": "Upload New Picture From URL",
@@ -105,6 +106,12 @@
 	"no-group-title": "No group title",
 
 	"select-skin": "Select a Skin",
+
+	"select-homepage": "Select a Homepage",
+	"homepage": "Homepage",
+	"homepage_description": "Select a page to use as the forum homepage or 'None' to use the default homepage.",
+	"custom_route": "Custom Homepage Route",
+	"custom_route_help": "Enter a route name here, without any preceding slash (e.g. \"recent\", or \"popular\")",
 
 	"sso.title": "Single Sign-on Services",
 	"sso.associated": "Associated with",

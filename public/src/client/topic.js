@@ -8,16 +8,20 @@ define('forum/topic', [
 	'forum/topic/threadTools',
 	'forum/topic/postTools',
 	'forum/topic/events',
-	'forum/topic/browsing',
 	'forum/topic/posts',
 	'navigator',
 	'sort',
 	'components'
-], function(infinitescroll, threadTools, postTools, events, browsing, posts, navigator, sort, components) {
+], function(infinitescroll, threadTools, postTools, events, posts, navigator, sort, components) {
 	var	Topic = {},
 		currentUrl = '';
 
 	$(window).on('action:ajaxify.start', function(ev, data) {
+		if (Topic.replaceURLTimeout) {
+			clearTimeout(Topic.replaceURLTimeout);
+			Topic.replaceURLTimeout = 0;
+		}
+
 		if (ajaxify.currentPage !== data.url) {
 			navigator.disable();
 			components.get('navbar/title').find('span').text('').hide();
@@ -64,16 +68,6 @@ define('forum/topic', [
 		navigator.init('[component="post/anchor"]', ajaxify.data.postcount, Topic.toTop, Topic.toBottom, Topic.navigatorCallback, Topic.calculateIndex);
 
 		$(window).on('scroll', updateTopicTitle);
-
-
-		if (app.user.uid) {
-			socket.emit('topics.enter', tid, function(err, data) {
-				if (err) {
-					return app.alertError(err.message);
-				}
-				browsing.onUpdateUsersInRoom(data);
-			});
-		}
 
 		handleTopicSearch();
 

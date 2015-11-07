@@ -536,15 +536,19 @@ Upgrade.upgrade = function(callback) {
 							if (err) {
 								return next(err);
 							}
-							console.log('deleting gravatar for uid ', uid);
+							
 							if (!userData.picture || !userData.gravatarpicture) {
 								return next();
 							}
 
 							if (userData.gravatarpicture === userData.picture) {
 								async.series([
-									async.apply(db.setObjectField, 'user:' + uid, 'picture', ''),
-									async.apply(db.deleteObjectField, 'user:' + uid, 'gravatarpicture')
+									function (next) {
+										db.setObjectField('user:' + uid, 'picture', '', next);
+									},
+									function (next) {
+										db.deleteObjectField('user:' + uid, 'gravatarpicture', next);	
+									}									
 								], next);
 							} else {
 								db.deleteObjectField('user:' + uid, 'gravatarpicture', next);
